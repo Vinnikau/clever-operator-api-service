@@ -1,5 +1,6 @@
 package com.vinnikov.clever.operator.api.request;
 
+import com.vinnikov.clever.operator.api.MessageType;
 import lombok.*;
 
 @Builder
@@ -7,8 +8,6 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class AuthorizationRequest extends AbstractRequest {
-    private String userName;
-    private String userPassword;
+public abstract class AbstractRequest {
+    protected MessageType messageType;
 }
