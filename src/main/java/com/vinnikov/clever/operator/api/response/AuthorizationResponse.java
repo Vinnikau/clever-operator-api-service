@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class AuthorizationResponse {
+public class AuthorizationResponse extends AbstractResponse {
+
     private String authorizationKey;
 }
