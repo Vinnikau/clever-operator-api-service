@@ -1,0 +1,32 @@
+server:
+  port: 8510
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+spring:
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bd_clever
+    username: postgres
+    password: postgres
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+      schema: schema_clever
+#graphite:
+#  reporterEnabled: true
+#  reporterAddress:
+#    host: 10.2.84.99
+#    port: 2004
+#  useBatch: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream, info, health

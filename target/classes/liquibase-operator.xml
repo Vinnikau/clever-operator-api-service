@@ -1,0 +1,204 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="svinnikov" id="clever-1-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="EmplPosition"/>
+            </not>
+        </preConditions>
+        <createTable tableName="EmplPosition">
+            <column name="ID_EmplPosition" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="EmplPosition_pk"/>
+            </column>
+            <column name="name_EmplPosition" type="java.sql.Types.VARCHAR(30)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="svinnikov" id="clever-1-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="Employee"/>
+            </not>
+        </preConditions>
+        <createTable tableName="Employee">
+            <column name="ID_Employee" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="Employee_pk"/>
+            </column>
+            <column name="FIO_Employee" type="java.sql.Types.VARCHAR(2048)"/>
+            <column name="Empl_Position" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_Empl_Position_ufps_id"
+                             referencedTableName="EmplPosition" referencedColumnNames="ID_EmplPosition"/>
+            </column>
+            <column name="phone_Employee" type="java.sql.Types.VARCHAR(20)"/>
+            <column name="email_Employee" type="java.sql.Types.VARCHAR(50)"/>
+            <column name="login_Employee" type="java.sql.Types.VARCHAR(50)"/>
+            <column name="password_Employee" type="java.sql.Types.VARCHAR(32)"/>
+            <column name="acting_Employee" type="java.sql.Types.VARCHAR(50)"/>
+            <column name="access_Rights" type="java.sql.Types.BOOLEAN"/>
+        </createTable>
+    </changeSet>
+    <!--
+         <changeSet author="akorzhov" id="PRPOSTUNIT-1-2">
+             <preConditions onFail="MARK_RAN">
+                 <not>
+                     <tableExists tableName="post_office"/>
+                 </not>
+             </preConditions>
+             <createTable tableName="post_office">
+                 <column name="id" type="BIGINT">
+                     <constraints primaryKey="true" primaryKeyName="post_office_pk"/>
+                 </column>
+                 <column name="version" type="java.sql.Types.BIGINT" defaultValue="0"/>
+                 <column name="created_at" type="java.sql.Types.TIMESTAMP"/>
+                 <column name="ufps_id" type="java.sql.Types.BIGINT">
+                     <constraints nullable="false" foreignKeyName="fk_post_office_ufps_id" referencedTableName="ufps" referencedColumnNames="id" />
+                 </column>
+                 <column name="full_name" type="java.sql.Types.VARCHAR(2048)">
+                     <constraints nullable="false"/>
+                 </column>
+                 <column name="account" type="java.sql.Types.VARCHAR(20)"/>
+                 <column name="inn" type="java.sql.Types.VARCHAR(12)"/>
+                 <column name="kpp" type="java.sql.Types.VARCHAR(9)"/>
+                 <column name="okato" type="java.sql.Types.VARCHAR(4)"/>
+                 <column name="bic" type="java.sql.Types.VARCHAR(9)"/>
+                 <column name="bank_full_name" type="java.sql.Types.VARCHAR(2048)"/>
+                 <column name="city" type="java.sql.Types.VARCHAR(512)"/>
+                 <column name="corr_account" type="java.sql.Types.VARCHAR(20)"/>
+                 <column name="kbk" type="java.sql.Types.VARCHAR(20)"/>
+                 <column name="technical_index" type="java.sql.Types.VARCHAR(32)"/>
+                 <column name="post_master_fio" type="java.sql.Types.VARCHAR(256)"/>
+                 <column name="chief_accountant_fio" type="java.sql.Types.VARCHAR(256)"/>
+                 <column name="power_of_attorney_number" type="java.sql.Types.VARCHAR(64)"/>
+             </createTable>
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-1-3">
+             <preConditions onFail="MARK_RAN">
+                 <not>
+                     <tableExists tableName="ops"/>
+                 </not>
+             </preConditions>
+             <createTable tableName="ops">
+                 <column name="id" type="BIGINT">
+                     <constraints primaryKey="true" primaryKeyName="ops_pk"/>
+                 </column>
+                 <column name="version" type="java.sql.Types.BIGINT" defaultValue="0"/>
+                 <column name="full_name" type="java.sql.Types.VARCHAR(2048)" />
+                 <column name="created_at" type="java.sql.Types.TIMESTAMP"/>
+                 <column name="post_office_id" type="java.sql.Types.BIGINT">
+                     <constraints nullable="false" foreignKeyName="fk_ops_post_office_id" referencedTableName="post_office" referencedColumnNames="id" />
+                 </column>
+                 <column name="address" type="java.sql.Types.VARCHAR(2048)"/>
+                 <column name="phone" type="java.sql.Types.BIGINT"/>
+                 <column name="rate_zone_number" type="java.sql.Types.VARCHAR(64)"/>
+                 <column name="ops_size" type="java.sql.Types.INTEGER"/>
+                 <column name="counterparty_ops_type" type="java.sql.Types.BOOLEAN"/>
+                 <column name="extra_ito_commission" type="java.sql.Types.BOOLEAN"/>
+                 <column name="insurance_ifl" type="java.sql.Types.BOOLEAN"/>
+                 <column name="lawyer_consultant_service" type="java.sql.Types.BOOLEAN"/>
+             </createTable>
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-1-7">
+             <preConditions onFail="MARK_RAN">
+                 <not>
+                     <tableExists tableName="sequences"/>
+                 </not>
+             </preConditions>
+             <createTable tableName="sequences">
+                 <column name="name" type="java.sql.Types.VARCHAR(256)">
+                     <constraints primaryKey="true" primaryKeyName="sequences_pk"/>
+                 </column>
+                 <column name="id" type="java.sql.Types.BIGINT"/>
+             </createTable>
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-1-8">
+             <preConditions onFail="MARK_RAN">
+                 <and>
+                     <tableExists tableName="post_office"/>
+                     <columnExists tableName="post_office" columnName="okato"/>
+                 </and>
+             </preConditions>
+             <modifyDataType tableName="post_office" columnName="okato" newDataType="java.sql.Types.VARCHAR(32)" />
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-1-9">
+             <preConditions onFail="MARK_RAN">
+                 <and>
+                     <tableExists tableName="ufps"/>
+                     <columnExists tableName="ufps" columnName="group_1c_files"/>
+                 </and>
+             </preConditions>
+             <modifyDataType tableName="ufps" columnName="group_1c_files" newDataType="java.sql.Types.BOOLEAN" />
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-1">
+             <sql>update ufps set group_order_by_offices = false where group_order_by_offices is null;</sql>
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-2">
+             <sql>update ufps set group_1c_files = false where group_1c_files is null;</sql>
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-3">
+             <sql>update ufps set allowed_to_write_f130_code = false where allowed_to_write_f130_code is null;</sql>
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-4">
+             <sql>update ufps set allowed_to_create_counterparty = false where allowed_to_create_counterparty is null;</sql>
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-5">
+             <sql>update ops set counterparty_ops_type = false where counterparty_ops_type is null;</sql>
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-6">
+             <sql>update ops set extra_ito_commission = false where extra_ito_commission is null;</sql>
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-7">
+             <sql>update ops set insurance_ifl = false where insurance_ifl is null;</sql>
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-8">
+             <sql>update ops set lawyer_consultant_service = false where lawyer_consultant_service is null;</sql>
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-9">
+             <addDefaultValue tableName="ufps" columnName="group_order_by_offices" defaultValueBoolean="false" />
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-10">
+             <addDefaultValue tableName="ufps" columnName="group_1c_files" defaultValueBoolean="false" />
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-11">
+             <addDefaultValue tableName="ufps" columnName="allowed_to_write_f130_code" defaultValueBoolean="false" />
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-12">
+             <addDefaultValue tableName="ufps" columnName="allowed_to_create_counterparty" defaultValueBoolean="false" />
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-13">
+             <addDefaultValue tableName="ops" columnName="extra_ito_commission" defaultValueBoolean="false" />
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-14">
+             <addDefaultValue tableName="ops" columnName="insurance_ifl" defaultValueBoolean="false" />
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-15">
+             <addDefaultValue tableName="ops" columnName="lawyer_consultant_service" defaultValueBoolean="false" />
+         </changeSet>
+
+         <changeSet author="akorzhov" id="PRPOSTUNIT-3-16">
+             <addDefaultValue tableName="ops" columnName="lawyer_consultant_service" defaultValueBoolean="false" />
+         </changeSet>
+     -->
+</databaseChangeLog>
