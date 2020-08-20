@@ -7,7 +7,7 @@ import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
 
-//@EntityScan(basePackages = {"com.intervale.prpo.structural.units.database.entity"})
+@EntityScan(basePackages = {"com.vinnikov.clever.operator.db.entity"})
 @EnableHystrixDashboard
 @EnableCircuitBreaker
 @EnableEurekaClient

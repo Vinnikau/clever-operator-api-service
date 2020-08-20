@@ -2,18 +2,18 @@ package com.vinnikov.clever.operator.db.entity;
 
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "Employee")
-@Builder
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@ToString
-public class Employee {
+public class EmployeeEntity {
+
     @Id
     @Column(name = "ID_Employee")
     private Long id;
