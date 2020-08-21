@@ -7,38 +7,38 @@
     <changeSet author="svinnikov" id="clever-1-1">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="EmplPosition"/>
+                <tableExists tableName="empl_position"/>
             </not>
         </preConditions>
-        <createTable tableName="EmplPosition">
-            <column name="ID_EmplPosition" type="BIGINT">
-                <constraints primaryKey="true" primaryKeyName="EmplPosition_pk"/>
+        <createTable tableName="empl_position">
+            <column name="id_empl_position" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="empl_position_pk"/>
             </column>
-            <column name="name_EmplPosition" type="java.sql.Types.VARCHAR(30)"/>
+            <column name="name_empl_position" type="java.sql.Types.VARCHAR(30)"/>
         </createTable>
     </changeSet>
 
     <changeSet author="svinnikov" id="clever-1-2">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="Employee"/>
+                <tableExists tableName="employee"/>
             </not>
         </preConditions>
-        <createTable tableName="Employee">
-            <column name="ID_Employee" type="BIGINT">
+        <createTable tableName="employee">
+            <column name="id_employee" type="BIGINT">
                 <constraints primaryKey="true" primaryKeyName="Employee_pk"/>
             </column>
-            <column name="FIO_Employee" type="java.sql.Types.VARCHAR(2048)"/>
-            <column name="Empl_Position" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="fk_Empl_Position_ufps_id"
-                             referencedTableName="EmplPosition" referencedColumnNames="ID_EmplPosition"/>
+            <column name="fio_employee" type="java.sql.Types.VARCHAR(2048)"/>
+            <column name="empl_position" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_empl_position_ufps_id"
+                             referencedTableName="empl_position" referencedColumnNames="id_empl_position"/>
             </column>
-            <column name="phone_Employee" type="java.sql.Types.VARCHAR(20)"/>
-            <column name="email_Employee" type="java.sql.Types.VARCHAR(50)"/>
-            <column name="login_Employee" type="java.sql.Types.VARCHAR(50)"/>
-            <column name="password_Employee" type="java.sql.Types.VARCHAR(32)"/>
-            <column name="acting_Employee" type="java.sql.Types.VARCHAR(50)"/>
-            <column name="access_Rights" type="java.sql.Types.BOOLEAN"/>
+            <column name="phone_employee" type="java.sql.Types.VARCHAR(20)"/>
+            <column name="email_employee" type="java.sql.Types.VARCHAR(50)"/>
+            <column name="login_employee" type="java.sql.Types.VARCHAR(50)"/>
+            <column name="password_employee" type="java.sql.Types.VARCHAR(32)"/>
+            <column name="acting_employee" type="java.sql.Types.BOOLEAN"/>
+            <column name="access_rights" type="java.sql.Types.VARCHAR(50)"/>
         </createTable>
     </changeSet>
 
@@ -48,17 +48,17 @@
                 <tableExists tableName="Authorization_history"/>
             </not>
         </preConditions>
-        <createTable tableName="Authorization_history">
-            <column name="ID_Authorization" type="BIGINT">
-                <constraints primaryKey="true" primaryKeyName="Authorization_history_pk"/>
+        <createTable tableName="authorization_history">
+            <column name="id_authorization" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="authorization_history_pk"/>
             </column>
-            <column name="Authorization_key" type="java.sql.Types.VARCHAR(32)"/>
-            <column name="Start_Authorization" type="java.sql.Types.TIMESTAMP"/>
-            <column name="End_Authorization" type="java.sql.Types.TIMESTAMP"/>
-            <column name="Remote_Address" type="java.sql.Types.VARCHAR(20)"/>
-            <column name="ID_Employee" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="fk_Authorization_history_Employee_id"
-                             referencedTableName="Employee" referencedColumnNames="ID_Employee"/>
+            <column name="authorization_key" type="java.sql.Types.VARCHAR(32)"/>
+            <column name="start_authorization" type="java.sql.Types.TIMESTAMP"/>
+            <column name="end_authorization" type="java.sql.Types.TIMESTAMP"/>
+            <column name="remote_address" type="java.sql.Types.VARCHAR(20)"/>
+            <column name="id_employee" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_Authorization_history_employee_id"
+                             referencedTableName="employee" referencedColumnNames="id_employee"/>
             </column>
         </createTable>
     </changeSet>

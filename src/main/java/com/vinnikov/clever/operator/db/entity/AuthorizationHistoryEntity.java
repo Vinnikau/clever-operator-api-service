@@ -10,15 +10,14 @@ import javax.persistence.Table;
 import java.util.Date;
 
 @javax.persistence.Entity
-@Table(name = "Authorization_history")
+@Table(name = "authorization_history")
 @NoArgsConstructor
 @Getter
 @Setter
 public class AuthorizationHistoryEntity {
     @Id
-    @Column(name = "ID_Authorization")
-    private Long id;
-    @Column(name = "Authorization_key")
+
+    private Long idAuthorization;
     private String authorizationKey;
     @Column(name = "Start_Authorization")
     private Date start;

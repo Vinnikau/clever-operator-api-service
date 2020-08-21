@@ -23,7 +23,6 @@ public class OperatorServiceImpl implements OperatorService {
     @Override
     public ResponseEntity<AuthorizationResponse> authorization(AuthorizationRequest request) {
         AuthorizationResponse response = new AuthorizationResponse();
-        /*
         Collection<EmployeeEntity> employee = employeeRepository.findByLogin(request.getUserName());
 
         if (employee == null || employee.size() == 0) {
@@ -35,7 +34,6 @@ public class OperatorServiceImpl implements OperatorService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-         */
         log.info("Authorization: {}", response.toString());
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
     }
