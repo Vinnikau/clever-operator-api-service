@@ -16,15 +16,10 @@ import java.util.Date;
 @Setter
 public class AuthorizationHistoryEntity {
     @Id
-
     private Long idAuthorization;
     private String authorizationKey;
-    @Column(name = "Start_Authorization")
-    private Date start;
-    @Column(name = "End_Authorization")
-    private Date end;
-    @Column(name = "Remote_Address")
-    private String remote;
-    @Column(name = "ID_Employee")
+    private Date startAuthorization;
+    private Date endAuthorization;
+    private String remoteAddress;
     private Long idEmployee;
 }

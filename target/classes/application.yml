@@ -1,5 +1,5 @@
 server:
-  port: 8510
+  port: 8520
 eureka:
   client:
     serviceUrl:
