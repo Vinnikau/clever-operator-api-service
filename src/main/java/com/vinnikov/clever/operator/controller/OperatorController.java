@@ -2,8 +2,10 @@ package com.vinnikov.clever.operator.controller;
 
 import com.vinnikov.clever.operator.api.request.AuthorizationRequest;
 import com.vinnikov.clever.operator.api.request.ServiceListRequest;
+import com.vinnikov.clever.operator.api.request.TicketUseRequest;
 import com.vinnikov.clever.operator.api.response.AuthorizationResponse;
 import com.vinnikov.clever.operator.api.response.ServiceListResponse;
+import com.vinnikov.clever.operator.api.response.TicketUseResponse;
 import com.vinnikov.clever.operator.service.OperatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -32,5 +34,11 @@ public class OperatorController {
     public ResponseEntity<ServiceListResponse> authorization(@RequestBody ServiceListRequest request) {
         log.info("Was received service-list-request: {}", request.getAuthorizationKey());
         return operatorService.getServiceList(request);
+    }
+
+    @PostMapping("/service/can/approve")
+    public ResponseEntity<TicketUseResponse> canApproveTicket(@RequestBody TicketUseRequest request) {
+        log.info("Was received service-list-request: {}", request.getAuthorizationKey());
+        return operatorService.canApproveTicketUseQr(request);
     }
 }

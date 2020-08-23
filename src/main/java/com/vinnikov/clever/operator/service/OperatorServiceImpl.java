@@ -2,13 +2,16 @@ package com.vinnikov.clever.operator.service;
 
 import com.vinnikov.clever.operator.api.request.AuthorizationRequest;
 import com.vinnikov.clever.operator.api.request.ServiceListRequest;
+import com.vinnikov.clever.operator.api.request.TicketUseRequest;
 import com.vinnikov.clever.operator.api.response.AuthorizationResponse;
 import com.vinnikov.clever.operator.api.response.ServiceListResponse;
+import com.vinnikov.clever.operator.api.response.TicketUseResponse;
 import com.vinnikov.clever.operator.api.response.util.AvailableService;
-import com.vinnikov.clever.operator.db.entity.AuthorizationHistoryEntity;
-import com.vinnikov.clever.operator.db.entity.EmployeeEntity;
+import com.vinnikov.clever.operator.db.entity.*;
+import com.vinnikov.clever.operator.db.repository.CustomerRepository;
 import com.vinnikov.clever.operator.db.repository.EmployeeRepository;
 import com.vinnikov.clever.operator.db.repository.ServiceRepository;
+import com.vinnikov.clever.operator.db.repository.TicketRepository;
 import com.vinnikov.clever.operator.util.KeyGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,6 +34,12 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
 
     @Resource
     private ServiceRepository serviceRepository;
+
+    @Resource
+    private TicketRepository ticketRepository;
+
+    @Resource
+    private CustomerRepository customerRepository;
 
     @Override
     public ResponseEntity<AuthorizationResponse> authorization(AuthorizationRequest request) {
@@ -87,33 +96,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .get();
         }
         try {
-            if (!isValidAuthorization(request.getAuthorizationKey())) {
-                log.error("It's fantastic");
-                response = ServiceListResponse.builder()
-                        .accessRights(0)
-                        .authorizationSuccess(false)
-                        .fail(true)
-                        .failDescription("Этого не может быть!")
-                        .availableServices(null)
-                        .build();
-            } else {
-                log.info("Auth is ok!");
-                int access = 0;
-                if (auth != null) {
-                    access = employeeRepository.findById(auth.getIdEmployee()).stream().findAny().get().getAccessRights();
-                }
-                Set<AvailableService> availableServices = serviceRepository.findAllWorkingServices().stream()
-                        .map(a -> AvailableService.builder().serviceId(a.getIdService()).serviceName(a.getName()).build())
-                        .collect(Collectors.toSet());
-                response = ServiceListResponse.builder()
-                        .accessRights(access)
-                        .authorizationSuccess(true)
-                        .fail(false)
-                        .failDescription("")
-                        .availableServices(availableServices)
-                        .build();
-            }
-            status = HttpStatus.OK;
+            isValidAuthorization(request.getAuthorizationKey());
         } catch (Exception e) {
             response = ServiceListResponse.builder()
                     .accessRights(0)
@@ -125,9 +108,97 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
             log.warn("Auth is time out. Authorization response: {}", response.toString());
             status = HttpStatus.UNAUTHORIZED;
         }
+        log.debug("Auth is ok!");
+        int access = 0;
+        if (auth != null) {
+            access = employeeRepository.findById(auth.getIdEmployee()).stream().findAny().get().getAccessRights();
+        }
+        Set<AvailableService> availableServices = serviceRepository.findAllWorkingServices().stream()
+                .map(a -> AvailableService.builder().serviceId(a.getIdService()).serviceName(a.getName()).build())
+                .collect(Collectors.toSet());
+        response = ServiceListResponse.builder()
+                .accessRights(access)
+                .authorizationSuccess(true)
+                .fail(false)
+                .failDescription("")
+                .availableServices(availableServices)
+                .build();
+        status = HttpStatus.OK;
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
+    @Override
+    public ResponseEntity<TicketUseResponse> canApproveTicketUseQr(TicketUseRequest request) {
+        TicketUseResponse response;
+        HttpStatus status;
+        Collection<AuthorizationHistoryEntity> authorizations =
+                authorizationHistoryRepository.findByAuthorizationKey(request.getAuthorizationKey());
+        AuthorizationHistoryEntity auth = null;
+        if (authorizations != null && authorizations.size() > 0) {
+            auth = authorizations.stream()
+                    .findAny()
+                    .get();
+        }
+        try {
+            isValidAuthorization(request.getAuthorizationKey());
+        } catch (Exception e) {
+            response = TicketUseResponse.builder()
+                    .accessRights(0)
+                    .authorizationSuccess(false)
+                    .fail(true)
+                    .failDescription(e.getMessage())
+                    .customerName("")
+                    .customerPhone("")
+                    .serviceId(0L)
+                    .serviceName("")
+                    .ticketCode(request.getTicketCode())
+                    .serviceProvideSuccess(false)
+                    .build();
+            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            status = HttpStatus.UNAUTHORIZED;
+        }
+        log.debug("Auth is ok!");
+        int access = 0;
+        if (auth != null) {
+            access = employeeRepository.findById(auth.getIdEmployee()).stream().findAny().get().getAccessRights();
+        }
+        TicketEntity ticket = ticketRepository.findByTicketNumber(request.getTicketCode());
+        ServiceEntity service = serviceRepository.findById(request.getServiceId()).get();
+        CustomerEntity customer = customerRepository.findById(ticket.getIdCustomer()).get();
+        try {
+            isValidTicket(request.getServiceId(), ticket);
+            response = TicketUseResponse.builder()
+                    .accessRights(access)
+                    .authorizationSuccess(true)
+                    .fail(false)
+                    .failDescription("")
+                    .customerName(customer.getNameCustomer() + " " + customer.getPatronymicCustomer()
+                            + " " + customer.getSurnameCustomer())
+                    .customerPhone(customer.getPhoneCustomer())
+                    .serviceId(ticket.getIdService())
+                    .serviceName(service.getName())
+                    .ticketCode(request.getTicketCode())
+                    .serviceProvideSuccess(true)
+                    .build();
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            response = TicketUseResponse.builder()
+                    .accessRights(access)
+                    .authorizationSuccess(true)
+                    .fail(true)
+                    .failDescription(e.getMessage())
+                    .customerName("")
+                    .customerPhone("")
+                    .serviceId(service.getIdService())
+                    .serviceName(service.getName())
+                    .ticketCode(request.getTicketCode())
+                    .serviceProvideSuccess(false)
+                    .build();
+            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
+    }
 
 
     private String getKey(AuthorizationRequest request, Long idUser, String remoteAdress) {

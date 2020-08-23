@@ -1,14 +1,12 @@
 package com.vinnikov.clever.operator.service;
 
-import com.vinnikov.clever.operator.api.response.ServiceListResponse;
 import com.vinnikov.clever.operator.db.entity.AuthorizationHistoryEntity;
+import com.vinnikov.clever.operator.db.entity.TicketEntity;
 import com.vinnikov.clever.operator.db.repository.AuthorizationHistoryRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 
 import javax.annotation.Resource;
 import java.util.Collection;
-import java.util.Date;
 
 @Slf4j
 public abstract class AbstractService {
@@ -16,8 +14,7 @@ public abstract class AbstractService {
     @Resource
     protected AuthorizationHistoryRepository authorizationHistoryRepository;
 
-    protected boolean isValidAuthorization(String key) {
-
+    protected void isValidAuthorization(String key) {
         Collection<AuthorizationHistoryEntity> authorizations =
                 authorizationHistoryRepository.findByAuthorizationKey(key);
         AuthorizationHistoryEntity auth = null;
@@ -34,7 +31,6 @@ public abstract class AbstractService {
             log.warn("Auth is time out. Authorization key from request: {}", key);
             throw new RuntimeException("Время сессии истекло.");
         }
-        return true;
     }
 
     private boolean isValidTime(AuthorizationHistoryEntity auth) {
@@ -43,5 +39,17 @@ public abstract class AbstractService {
             throw new RuntimeException("Вышло время авторизации.");
         }
         return true;
+    }
+
+    protected void isValidTicket(Long serviceId, TicketEntity ticket) {
+        if (ticket.getIdService() != serviceId) {
+            throw new RuntimeException("Вы не авторизованы для гашения этого билета");
+        }
+        if (ticket.getService() != null) {
+            throw new RuntimeException("По данному билету услуга уже оказана");
+        }
+        if (ticket.getIdRefund() != null) {
+            throw new RuntimeException("По даному билеты был осуществелн возврат");
+        }
     }
 }
