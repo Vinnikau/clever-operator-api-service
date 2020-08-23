@@ -53,7 +53,6 @@ public class OperatorServiceImpl implements OperatorService {
         Date authTime = new Date(System.currentTimeMillis());
         String ak = KeyGenerator.generateKey(request.getUserName(), authTime);
 
-
         response.setFail(Boolean.FALSE);
         response.setFailDescription("");
         response.setAccessRights(employeeEntity.getAccessRights());
