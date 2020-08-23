@@ -4,9 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.annotation.processing.Generated;
+import javax.persistence.*;
 import java.util.Date;
 
 @javax.persistence.Entity
@@ -16,6 +15,7 @@ import java.util.Date;
 @Setter
 public class AuthorizationHistoryEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long idAuthorization;
     private String authorizationKey;
     private Date startAuthorization;

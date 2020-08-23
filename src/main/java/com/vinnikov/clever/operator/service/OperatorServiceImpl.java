@@ -54,7 +54,7 @@ public class OperatorServiceImpl implements OperatorService {
         String ak = KeyGenerator.generateKey(request.getUserName(), authTime);
 
 
-        response.setFail(false);
+        response.setFail(Boolean.FALSE);
         response.setFailDescription("");
         response.setAccessRights(employeeEntity.getAccessRights());
         response.setAuthorizationSuccess(true);
@@ -63,14 +63,13 @@ public class OperatorServiceImpl implements OperatorService {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
-    private string getKey(String key, AuthorizationRequest request, Long idUser, String remoteAdress) {
+    private String getKey(String key, AuthorizationRequest request, Long idUser, String remoteAdress) {
         Long now = System.currentTimeMillis();
         Date startTime = new Date(now);
         Date endTime = new Date(now + 28800000L);
 
-        String ak = KeyGenerator.generateKey(request.getUserName(), authTime);
+        String ak = KeyGenerator.generateKey(request.getUserName(), startTime);
         AuthorizationHistoryEntity history = new AuthorizationHistoryEntity();
-        history.setIdAuthorization(1L);
         history.authorizationKey(ak);
         history.setStartAuthorization(startTime);
         history.setEndAuthorization(endTime);

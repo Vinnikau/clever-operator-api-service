@@ -15,4 +15,6 @@ public class AuthorizationResponse {
     private String failDescription;
     private Integer accessRights;
     private Boolean authorizationSuccess;
+
+
 }
