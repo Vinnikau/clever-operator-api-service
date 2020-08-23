@@ -1,0 +1,15 @@
+com\vinnikov\clever\operator\api\MessageType.class
+com\vinnikov\clever\operator\service\OperatorServiceImpl.class
+com\vinnikov\clever\operator\db\repository\EmployeeRepository.class
+com\vinnikov\clever\operator\conf\LiquibaseConfigurer.class
+com\vinnikov\clever\operator\conf\SwaggerConfig.class
+com\vinnikov\clever\operator\OperatorApiService.class
+com\vinnikov\clever\operator\api\response\AuthorizationResponse$AuthorizationResponseBuilder.class
+com\vinnikov\clever\operator\api\response\AuthorizationResponse.class
+com\vinnikov\clever\operator\service\OperatorService.class
+com\vinnikov\clever\operator\db\entity\AuthorizationHistoryEntity.class
+com\vinnikov\clever\operator\util\KeyGenerator.class
+com\vinnikov\clever\operator\db\entity\EmployeeEntity.class
+com\vinnikov\clever\operator\db\repository\AuthorizationHistoryRepository.class
+com\vinnikov\clever\operator\api\request\AuthorizationRequest.class
+com\vinnikov\clever\operator\controller\OperatorController.class

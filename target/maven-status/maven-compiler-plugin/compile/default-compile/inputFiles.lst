@@ -1,0 +1,14 @@
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\service\OperatorService.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\controller\OperatorController.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\conf\LiquibaseConfigurer.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\api\MessageType.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\db\entity\EmployeeEntity.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\OperatorApiService.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\service\OperatorServiceImpl.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\api\request\AuthorizationRequest.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\util\KeyGenerator.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\db\repository\EmployeeRepository.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\api\response\AuthorizationResponse.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\db\repository\AuthorizationHistoryRepository.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\db\entity\AuthorizationHistoryEntity.java
+C:\Users\glare\IdeaProjects\operator\src\main\java\com\vinnikov\clever\operator\conf\SwaggerConfig.java
