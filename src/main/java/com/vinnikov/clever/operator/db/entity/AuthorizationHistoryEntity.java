@@ -3,16 +3,17 @@ package com.vinnikov.clever.operator.db.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-import javax.annotation.processing.Generated;
 import javax.persistence.*;
 import java.util.Date;
 
-@javax.persistence.Entity
+@Entity
 @Table(name = "authorization_history")
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class AuthorizationHistoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

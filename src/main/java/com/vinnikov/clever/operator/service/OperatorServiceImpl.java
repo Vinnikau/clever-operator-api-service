@@ -41,7 +41,7 @@ public class OperatorServiceImpl implements OperatorService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.APPLICATION_JSON).body(response);
         }
         EmployeeEntity employeeEntity = employee.stream().findFirst().get();
-        if (employeeEntity.getPasswordEmployee() != request.getUserPassword()) {
+        if (!employeeEntity.getPasswordEmployee().equals(request.getUserPassword())) {
             response.setFail(true);
             response.setFailDescription("Имя пользователя или пароль не верные.");
             response.setAccessRights(0);
@@ -50,8 +50,15 @@ public class OperatorServiceImpl implements OperatorService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-        Date authTime = new Date(System.currentTimeMillis());
-        String ak = KeyGenerator.generateKey(request.getUserName(), authTime);
+        if(!employeeEntity.getActingEmployee()) {
+            response.setFail(true);
+            response.setFailDescription("Отказано в доступе. Работник не работает в данный момент.");
+            response.setAccessRights(0);
+            response.setAuthorizationSuccess(false);
+            log.info("Password is not correct. {}. Authorization false: {}", request.getUserName(), response.toString());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.APPLICATION_JSON).body(response);
+        }
+        String ak = getKey(request, employeeEntity.getIdEmployee(), "remote");
 
         response.setFail(Boolean.FALSE);
         response.setFailDescription("");
@@ -62,21 +69,21 @@ public class OperatorServiceImpl implements OperatorService {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
-    private String getKey(String key, AuthorizationRequest request, Long idUser, String remoteAdress) {
+    private String getKey(AuthorizationRequest request, Long idUser, String remoteAdress) {
         Long now = System.currentTimeMillis();
         Date startTime = new Date(now);
         Date endTime = new Date(now + 28800000L);
 
         String ak = KeyGenerator.generateKey(request.getUserName(), startTime);
         AuthorizationHistoryEntity history = new AuthorizationHistoryEntity();
-        history.authorizationKey(ak);
+        history.setAuthorizationKey(ak);
         history.setStartAuthorization(startTime);
         history.setEndAuthorization(endTime);
         history.setRemoteAddress(remoteAdress);
         history.setIdEmployee(idUser);
 
-        authorizationHistoryRepository.save(history);
-
+        AuthorizationHistoryEntity his = authorizationHistoryRepository.save(history);
+        log.debug(his.toString());
         return ak;
     }
 
