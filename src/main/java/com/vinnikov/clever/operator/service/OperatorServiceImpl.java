@@ -4,9 +4,11 @@ import com.vinnikov.clever.operator.api.request.AuthorizationRequest;
 import com.vinnikov.clever.operator.api.request.ServiceListRequest;
 import com.vinnikov.clever.operator.api.response.AuthorizationResponse;
 import com.vinnikov.clever.operator.api.response.ServiceListResponse;
+import com.vinnikov.clever.operator.api.response.util.AvailableService;
 import com.vinnikov.clever.operator.db.entity.AuthorizationHistoryEntity;
 import com.vinnikov.clever.operator.db.entity.EmployeeEntity;
 import com.vinnikov.clever.operator.db.repository.EmployeeRepository;
+import com.vinnikov.clever.operator.db.repository.ServiceRepository;
 import com.vinnikov.clever.operator.util.KeyGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -24,6 +28,9 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
 
     @Resource
     private EmployeeRepository employeeRepository;
+
+    @Resource
+    private ServiceRepository serviceRepository;
 
     @Override
     public ResponseEntity<AuthorizationResponse> authorization(AuthorizationRequest request) {
@@ -92,12 +99,15 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
             } else {
                 log.info("Auth is ok!");
                 int access = employeeRepository.findById(auth.getIdEmployee()).stream().findAny().get().getAccessRights();
+                Set<AvailableService> availableServices = serviceRepository.findAllWorkingServices().stream()
+                        .map(a -> AvailableService.builder().serviceId(a.getIdService()).serviceName(a.getName()).build())
+                        .collect(Collectors.toSet());
                 response = ServiceListResponse.builder()
                         .accessRights(access)
                         .authorizationSuccess(true)
                         .fail(false)
                         .failDescription("")
-                        .availableServices(null)
+                        .availableServices(availableServices)
                         .build();
             }
             status = HttpStatus.OK;
@@ -115,6 +125,8 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
 
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
     }
+
+
 
     private String getKey(AuthorizationRequest request, Long idUser, String remoteAdress) {
         Long now = System.currentTimeMillis();

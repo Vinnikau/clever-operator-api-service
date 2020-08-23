@@ -10,5 +10,5 @@ import lombok.*;
 @ToString
 public class AvailableService {
     private Long serviceId;
-    private Long serviceName;
+    private String serviceName;
 }

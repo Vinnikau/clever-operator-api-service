@@ -11,5 +11,5 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
 
 
     @Query("SELECT d FROM ServiceEntity d WHERE d.working = true")
-    Collection<EmployeeEntity> findAllWorkingServices();
+    Collection<ServiceEntity> findAllWorkingServices();
 }
