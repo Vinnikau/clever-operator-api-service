@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -305,8 +303,65 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
         }
         try {
             isValidAuthorization(request.getAuthorizationKey());
-            Collection<SearchTicket> searchTickets = ticketRepository.findAllByParam(request.getCustomerPhone(),
-                    request.getAuthorizationKey(), request.getCustomerName());
+            log.debug("Auth is ok!");
+            Set<SearchTicket> searchTickets = new HashSet<>();
+            if (request.getTicketCode() != null) {
+                TicketEntity ticket = ticketRepository.findByTicketNumber(request.getTicketCode());
+                CustomerEntity customer = customerRepository.findById(ticket.getIdCustomer()).get();
+                SearchTicket searchTicket = SearchTicket.builder()
+                        .serviceId(ticket.getIdService())
+                        .ticketCode(ticket.getNumberTicket())
+                        .serviceName(serviceRepository.findById(ticket.getIdService()).get().getName())
+                        .customerPhone(customer.getPhoneCustomer())
+                        .customerName(customer.getNameCustomer() + " " + customer.getPatronymicCustomer() + " "
+                                + customer.getSurnameCustomer())
+                        .build();
+                searchTickets.add(searchTicket);
+            }
+            if (request.getCustomerName() != null) {
+                Collection<CustomerEntity> customers = customerRepository.findByName(request.getCustomerName());
+                Collection<TicketEntity> tickets = ticketRepository.findAllByIdCustomer(customers.stream()
+                        .map(a -> a.getIdCustomer())
+                        .collect(Collectors.toSet()));
+                for (TicketEntity ticket : tickets) {
+                    CustomerEntity customer = customers.stream()
+                            .filter(a -> a.getIdCustomer() == ticket.getIdCustomer())
+                            .findAny()
+                            .get();
+                    SearchTicket searchTicket = SearchTicket.builder()
+                            .serviceId(ticket.getIdService())
+                            .ticketCode(ticket.getNumberTicket())
+                            .serviceName(serviceRepository.findById(ticket.getIdService()).get().getName())
+                            .customerPhone(customer.getPhoneCustomer())
+                            .customerName(customer.getNameCustomer() + " " + customer.getPatronymicCustomer() + " "
+                                    + customer.getSurnameCustomer())
+                            .build();
+                    searchTickets.add(searchTicket);
+                }
+            }
+            if (request.getCustomerPhone() != null) {
+                Collection<CustomerEntity> customers = customerRepository.findByPhone(request.getCustomerPhone());
+                Collection<TicketEntity> tickets = ticketRepository.findAllByIdCustomer(customers.stream()
+                        .map(a -> a.getIdCustomer())
+                        .collect(Collectors.toSet()));
+                for (TicketEntity ticket : tickets) {
+                    CustomerEntity customer = customers.stream()
+                            .filter(a -> a.getIdCustomer() == ticket.getIdCustomer())
+                            .findAny()
+                            .get();
+                    SearchTicket searchTicket = SearchTicket.builder()
+                            .serviceId(ticket.getIdService())
+                            .ticketCode(ticket.getNumberTicket())
+                            .serviceName(serviceRepository.findById(ticket.getIdService()).get().getName())
+                            .customerPhone(customer.getPhoneCustomer())
+                            .customerName(customer.getNameCustomer() + " " + customer.getPatronymicCustomer() + " "
+                                    + customer.getSurnameCustomer())
+                            .build();
+                    searchTickets.add(searchTicket);
+                }
+            }
+            log.info("Search result: {}", searchTickets.toString());
+
             response = TicketSearchResponse.builder()
                     .searchTickets(searchTickets)
                     .accessRights(0)
@@ -323,11 +378,9 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .fail(true)
                     .failDescription(e.getMessage())
                     .build();
-            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            log.warn("Authorization response: {}", response.toString());
             status = HttpStatus.UNAUTHORIZED;
         }
-        log.debug("Auth is ok!");
-
 
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
     }

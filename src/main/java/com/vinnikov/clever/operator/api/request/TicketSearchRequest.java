@@ -13,8 +13,9 @@ public class TicketSearchRequest {
     private String authorizationKey;
     private MessageType messageType;
     private Long serviceId;
-    private String String;
+    private String ticketCode;
     private String customerName;
     private String customerPhone;
+
 
 }
