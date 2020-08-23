@@ -98,7 +98,10 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                         .build();
             } else {
                 log.info("Auth is ok!");
-                int access = employeeRepository.findById(auth.getIdEmployee()).stream().findAny().get().getAccessRights();
+                int access = 0;
+                if (auth != null) {
+                    access = employeeRepository.findById(auth.getIdEmployee()).stream().findAny().get().getAccessRights();
+                }
                 Set<AvailableService> availableServices = serviceRepository.findAllWorkingServices().stream()
                         .map(a -> AvailableService.builder().serviceId(a.getIdService()).serviceName(a.getName()).build())
                         .collect(Collectors.toSet());
@@ -122,7 +125,6 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
             log.warn("Auth is time out. Authorization response: {}", response.toString());
             status = HttpStatus.UNAUTHORIZED;
         }
-
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
