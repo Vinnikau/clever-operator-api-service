@@ -2,9 +2,11 @@ package com.vinnikov.clever.operator.service;
 
 import com.vinnikov.clever.operator.api.request.AuthorizationRequest;
 import com.vinnikov.clever.operator.api.request.ServiceListRequest;
+import com.vinnikov.clever.operator.api.request.TicketUseProofRequest;
 import com.vinnikov.clever.operator.api.request.TicketUseRequest;
 import com.vinnikov.clever.operator.api.response.AuthorizationResponse;
 import com.vinnikov.clever.operator.api.response.ServiceListResponse;
+import com.vinnikov.clever.operator.api.response.TicketUseProofResponse;
 import com.vinnikov.clever.operator.api.response.TicketUseResponse;
 import com.vinnikov.clever.operator.api.response.util.AvailableService;
 import com.vinnikov.clever.operator.db.entity.*;
@@ -162,11 +164,18 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
         if (auth != null) {
             access = employeeRepository.findById(auth.getIdEmployee()).stream().findAny().get().getAccessRights();
         }
-        TicketEntity ticket = ticketRepository.findByTicketNumber(request.getTicketCode());
-        ServiceEntity service = serviceRepository.findById(request.getServiceId()).get();
-        CustomerEntity customer = customerRepository.findById(ticket.getIdCustomer()).get();
         try {
+            TicketEntity ticket = ticketRepository.findByTicketNumber(request.getTicketCode());
             isValidTicket(request.getServiceId(), ticket);
+            ServiceEntity service;
+            CustomerEntity customer;
+            try {
+                service = serviceRepository.findById(request.getServiceId()).get();
+                customer = customerRepository.findById(ticket.getIdCustomer()).get();
+            }  catch (Exception e) {
+                throw new RuntimeException("Некорректные данные");
+            }
+
             response = TicketUseResponse.builder()
                     .accessRights(access)
                     .authorizationSuccess(true)
@@ -189,8 +198,8 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .failDescription(e.getMessage())
                     .customerName("")
                     .customerPhone("")
-                    .serviceId(service.getIdService())
-                    .serviceName(service.getName())
+                    .serviceId(request.getServiceId())
+                    .serviceName("")
                     .ticketCode(request.getTicketCode())
                     .serviceProvideSuccess(false)
                     .build();
@@ -198,6 +207,11 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
             status = HttpStatus.BAD_REQUEST;
         }
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
+    }
+
+    @Override
+    public ResponseEntity<TicketUseProofResponse> proofTicketUseQr(TicketUseProofRequest request) {
+        return null;
     }
 
 

@@ -5,21 +5,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
-@Table(name = "ticket")
+@Table(name = "service_provision")
 @Getter
 @Setter
 @NoArgsConstructor
-public class TicketEntity {
+public class ProvisionEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long idTicket;
-    private Long idCustomer;
-    private Long idPurchase;
-    private String numberTicket;
-    private Long service;
-    private Long idRefund;
-    private Long idService;
-
+    private Long idProvision;
+    private Long idEmployee;
+    private Date dateService;
 }

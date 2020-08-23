@@ -41,7 +41,10 @@ public abstract class AbstractService {
         return true;
     }
 
-    protected void isValidTicket(Long serviceId, TicketEntity ticket) {
+    protected void isValidTicket(Long serviceId, TicketEntity ticket) throws RuntimeException {
+        if (ticket == null) {
+            throw new RuntimeException("Билет не найден");
+        }
         if (ticket.getIdService() != serviceId) {
             throw new RuntimeException("Вы не авторизованы для гашения этого билета");
         }
