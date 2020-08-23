@@ -60,7 +60,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-        if(!employeeEntity.getActingEmployee()) {
+        if (!employeeEntity.getActingEmployee()) {
             response.setFail(true);
             response.setFailDescription("Отказано в доступе. Работник не работает в данный момент.");
             response.setAccessRights(0);
@@ -166,7 +166,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
             try {
                 service = serviceRepository.findById(request.getServiceId()).get();
                 customer = customerRepository.findById(ticket.getIdCustomer()).get();
-            }  catch (Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException("Некорректные данные");
             }
 
@@ -246,7 +246,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
             CustomerEntity customer;
             try {
                 service = serviceRepository.findById(request.getServiceId()).get();
-            }  catch (Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException("Некорректные данные");
             }
 
@@ -336,7 +336,9 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                             .customerName(customer.getNameCustomer() + " " + customer.getPatronymicCustomer() + " "
                                     + customer.getSurnameCustomer())
                             .build();
-                    searchTickets.add(searchTicket);
+                    if (!searchTickets.stream().anyMatch(a -> a.getTicketCode() == searchTicket.getTicketCode())) {
+                        searchTickets.add(searchTicket);
+                    }
                 }
             }
             if (request.getCustomerPhone() != null) {
@@ -357,16 +359,18 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                             .customerName(customer.getNameCustomer() + " " + customer.getPatronymicCustomer() + " "
                                     + customer.getSurnameCustomer())
                             .build();
-                    searchTickets.add(searchTicket);
+
+                    if (!searchTickets.stream().anyMatch(a -> a.getTicketCode() == searchTicket.getTicketCode())) {
+                        searchTickets.add(searchTicket);
+                    }
                 }
             }
             log.info("Search result: {}", searchTickets.toString());
-
             response = TicketSearchResponse.builder()
                     .searchTickets(searchTickets)
-                    .accessRights(0)
-                    .authorizationSuccess(false)
-                    .fail(true)
+                    .accessRights(employeeRepository.findById(auth.getIdEmployee()).get().getAccessRights())
+                    .authorizationSuccess(true)
+                    .fail(false)
                     .failDescription("")
                     .build();
             status = HttpStatus.OK;
