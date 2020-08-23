@@ -1,7 +1,9 @@
 package com.vinnikov.clever.operator.controller;
 
 import com.vinnikov.clever.operator.api.request.AuthorizationRequest;
+import com.vinnikov.clever.operator.api.request.ServiceListRequest;
 import com.vinnikov.clever.operator.api.response.AuthorizationResponse;
+import com.vinnikov.clever.operator.api.response.ServiceListResponse;
 import com.vinnikov.clever.operator.service.OperatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,5 +26,11 @@ public class OperatorController {
     public ResponseEntity<AuthorizationResponse> authorization(@RequestBody AuthorizationRequest request) {
         log.info("Was received auth-request by user: {}", request.getUserName());
         return operatorService.authorization(request);
+    }
+
+    @PostMapping("/service/list")
+    public ResponseEntity<ServiceListResponse> authorization(@RequestBody ServiceListRequest request) {
+        log.info("Was received service-list-request: {}", request.getAuthorizationKey());
+        return operatorService.getServiceList(request);
     }
 }

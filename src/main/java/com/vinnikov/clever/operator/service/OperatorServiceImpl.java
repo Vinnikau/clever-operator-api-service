@@ -1,10 +1,11 @@
 package com.vinnikov.clever.operator.service;
 
 import com.vinnikov.clever.operator.api.request.AuthorizationRequest;
+import com.vinnikov.clever.operator.api.request.ServiceListRequest;
 import com.vinnikov.clever.operator.api.response.AuthorizationResponse;
+import com.vinnikov.clever.operator.api.response.ServiceListResponse;
 import com.vinnikov.clever.operator.db.entity.AuthorizationHistoryEntity;
 import com.vinnikov.clever.operator.db.entity.EmployeeEntity;
-import com.vinnikov.clever.operator.db.repository.AuthorizationHistoryRepository;
 import com.vinnikov.clever.operator.db.repository.EmployeeRepository;
 import com.vinnikov.clever.operator.util.KeyGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +20,10 @@ import java.util.Date;
 
 @Slf4j
 @Service
-public class OperatorServiceImpl implements OperatorService {
+public class OperatorServiceImpl extends AbstractService implements OperatorService {
 
     @Resource
     private EmployeeRepository employeeRepository;
-
-    @Resource
-    private AuthorizationHistoryRepository authorizationHistoryRepository;
 
     @Override
     public ResponseEntity<AuthorizationResponse> authorization(AuthorizationRequest request) {
@@ -67,6 +65,55 @@ public class OperatorServiceImpl implements OperatorService {
         response.setAuthorizationKey(ak);
         log.info("Authorization: {}", response.toString());
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
+    }
+
+    @Override
+    public ResponseEntity<ServiceListResponse> getServiceList(ServiceListRequest request) {
+        ServiceListResponse response;
+        HttpStatus status;
+        Collection<AuthorizationHistoryEntity> authorizations =
+                authorizationHistoryRepository.findByAuthorizationKey(request.getAuthorizationKey());
+        AuthorizationHistoryEntity auth = null;
+        if (authorizations != null && authorizations.size() > 0) {
+            auth = authorizations.stream()
+                    .findAny()
+                    .get();
+        }
+        try {
+            if (!isValidAuthorization(request.getAuthorizationKey())) {
+                log.error("It's fantastic");
+                response = ServiceListResponse.builder()
+                        .accessRights(0)
+                        .authorizationSuccess(false)
+                        .fail(true)
+                        .failDescription("Этого не может быть!")
+                        .availableServices(null)
+                        .build();
+            } else {
+                log.info("Auth is ok!");
+                int access = employeeRepository.findById(auth.getIdEmployee()).stream().findAny().get().getAccessRights();
+                response = ServiceListResponse.builder()
+                        .accessRights(access)
+                        .authorizationSuccess(true)
+                        .fail(false)
+                        .failDescription("")
+                        .availableServices(null)
+                        .build();
+            }
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            response = ServiceListResponse.builder()
+                    .accessRights(0)
+                    .authorizationSuccess(false)
+                    .fail(true)
+                    .failDescription(e.getMessage())
+                    .availableServices(null)
+                    .build();
+            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            status = HttpStatus.UNAUTHORIZED;
+        }
+
+        return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
     private String getKey(AuthorizationRequest request, Long idUser, String remoteAdress) {
