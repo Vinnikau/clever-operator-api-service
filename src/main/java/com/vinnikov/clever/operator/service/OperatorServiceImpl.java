@@ -1,19 +1,11 @@
 package com.vinnikov.clever.operator.service;
 
-import com.vinnikov.clever.operator.api.request.AuthorizationRequest;
-import com.vinnikov.clever.operator.api.request.ServiceListRequest;
-import com.vinnikov.clever.operator.api.request.TicketUseProofRequest;
-import com.vinnikov.clever.operator.api.request.TicketUseRequest;
-import com.vinnikov.clever.operator.api.response.AuthorizationResponse;
-import com.vinnikov.clever.operator.api.response.ServiceListResponse;
-import com.vinnikov.clever.operator.api.response.TicketUseProofResponse;
-import com.vinnikov.clever.operator.api.response.TicketUseResponse;
+import com.vinnikov.clever.operator.api.request.*;
+import com.vinnikov.clever.operator.api.response.*;
 import com.vinnikov.clever.operator.api.response.util.AvailableService;
+import com.vinnikov.clever.operator.api.response.util.SearchTicket;
 import com.vinnikov.clever.operator.db.entity.*;
-import com.vinnikov.clever.operator.db.repository.CustomerRepository;
-import com.vinnikov.clever.operator.db.repository.EmployeeRepository;
-import com.vinnikov.clever.operator.db.repository.ServiceRepository;
-import com.vinnikov.clever.operator.db.repository.TicketRepository;
+import com.vinnikov.clever.operator.db.repository.*;
 import com.vinnikov.clever.operator.util.KeyGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
@@ -42,6 +35,9 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
 
     @Resource
     private CustomerRepository customerRepository;
+
+    @Resource
+    private ProvisionRepository provisionRepository;
 
     @Override
     public ResponseEntity<AuthorizationResponse> authorization(AuthorizationRequest request) {
@@ -151,7 +147,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .failDescription(e.getMessage())
                     .customerName("")
                     .customerPhone("")
-                    .serviceId(0L)
+                    .serviceId(request.getServiceId())
                     .serviceName("")
                     .ticketCode(request.getTicketCode())
                     .serviceProvideSuccess(false)
@@ -210,10 +206,131 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
     }
 
     @Override
+    @Transactional
     public ResponseEntity<TicketUseProofResponse> proofTicketUseQr(TicketUseProofRequest request) {
-        return null;
+        TicketUseProofResponse response;
+        HttpStatus status;
+        Collection<AuthorizationHistoryEntity> authorizations =
+                authorizationHistoryRepository.findByAuthorizationKey(request.getAuthorizationKey());
+        AuthorizationHistoryEntity auth = null;
+        if (authorizations != null && authorizations.size() > 0) {
+            auth = authorizations.stream()
+                    .findAny()
+                    .get();
+        }
+        try {
+            isValidAuthorization(request.getAuthorizationKey());
+        } catch (Exception e) {
+            response = TicketUseProofResponse.builder()
+                    .accessRights(0)
+                    .authorizationSuccess(false)
+                    .fail(true)
+                    .failDescription(e.getMessage())
+                    .serviceId(request.getServiceId())
+                    .serviceName("")
+                    .ticketCode(request.getTicketCode())
+                    .dateTimeProof(null)
+                    .errorDescription(e.getMessage())
+                    .serviceProofSuccess(false)
+                    .build();
+            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            status = HttpStatus.UNAUTHORIZED;
+        }
+        log.debug("Auth is ok!");
+        int access = 0;
+        if (auth != null) {
+            access = employeeRepository.findById(auth.getIdEmployee()).stream().findAny().get().getAccessRights();
+        }
+        try {
+            TicketEntity ticket = ticketRepository.findByTicketNumber(request.getTicketCode());
+            isValidTicket(request.getServiceId(), ticket);
+            ServiceEntity service;
+            CustomerEntity customer;
+            try {
+                service = serviceRepository.findById(request.getServiceId()).get();
+            }  catch (Exception e) {
+                throw new RuntimeException("Некорректные данные");
+            }
+
+            ProvisionEntity provision = new ProvisionEntity();
+            provision.setDateService(new Date(System.currentTimeMillis()));
+            provision.setIdEmployee(auth.getIdEmployee());
+            provision = provisionRepository.save(provision);
+            ticket.setService(provision.getIdProvision());
+            ticket = ticketRepository.save(ticket);
+            response = TicketUseProofResponse.builder()
+                    .accessRights(access)
+                    .authorizationSuccess(true)
+                    .fail(false)
+                    .failDescription("")
+                    .serviceProofSuccess(true)
+                    .errorDescription("")
+                    .dateTimeProof(provision.getDateService())
+                    .ticketCode(ticket.getNumberTicket())
+                    .serviceId(ticket.getIdService())
+                    .serviceName(service.getName())
+                    .ticketCode(request.getTicketCode())
+                    .build();
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            response = TicketUseProofResponse.builder()
+                    .accessRights(access)
+                    .authorizationSuccess(false)
+                    .fail(true)
+                    .failDescription(e.getMessage())
+                    .serviceId(request.getServiceId())
+                    .serviceName("")
+                    .ticketCode(request.getTicketCode())
+                    .dateTimeProof(null)
+                    .errorDescription(e.getMessage())
+                    .serviceProofSuccess(false)
+                    .build();
+            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
+    @Override
+    public ResponseEntity<TicketSearchResponse> searchTicket(TicketSearchRequest request) {
+        TicketSearchResponse response;
+        HttpStatus status;
+        Collection<AuthorizationHistoryEntity> authorizations =
+                authorizationHistoryRepository.findByAuthorizationKey(request.getAuthorizationKey());
+        AuthorizationHistoryEntity auth = null;
+        if (authorizations != null && authorizations.size() > 0) {
+            auth = authorizations.stream()
+                    .findAny()
+                    .get();
+        }
+        try {
+            isValidAuthorization(request.getAuthorizationKey());
+            Collection<SearchTicket> searchTickets = ticketRepository.findAllByParam(request.getCustomerPhone(),
+                    request.getAuthorizationKey(), request.getCustomerName());
+            response = TicketSearchResponse.builder()
+                    .searchTickets(searchTickets)
+                    .accessRights(0)
+                    .authorizationSuccess(false)
+                    .fail(true)
+                    .failDescription("")
+                    .build();
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            response = TicketSearchResponse.builder()
+                    .searchTickets(null)
+                    .accessRights(0)
+                    .authorizationSuccess(false)
+                    .fail(true)
+                    .failDescription(e.getMessage())
+                    .build();
+            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            status = HttpStatus.UNAUTHORIZED;
+        }
+        log.debug("Auth is ok!");
+
+
+        return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
+    }
 
     private String getKey(AuthorizationRequest request, Long idUser, String remoteAdress) {
         Long now = System.currentTimeMillis();
