@@ -101,8 +101,9 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .failDescription(e.getMessage())
                     .availableServices(null)
                     .build();
-            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            log.warn("Authorization fail. Service list response: {}", response.toString());
             status = HttpStatus.UNAUTHORIZED;
+            return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
         }
         log.debug("Auth is ok!");
         int access = 0;
@@ -150,8 +151,9 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .ticketCode(request.getTicketCode())
                     .serviceProvideSuccess(false)
                     .build();
-            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            log.warn("Authorization fail. Authorization response: {}", response.toString());
             status = HttpStatus.UNAUTHORIZED;
+            return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
         }
         log.debug("Auth is ok!");
         int access = 0;
@@ -184,6 +186,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .serviceProvideSuccess(true)
                     .build();
             status = HttpStatus.OK;
+
         } catch (Exception e) {
             response = TicketUseResponse.builder()
                     .accessRights(access)
@@ -197,7 +200,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .ticketCode(request.getTicketCode())
                     .serviceProvideSuccess(false)
                     .build();
-            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            log.warn("Authorization fail. Authorization response: {}", response.toString());
             status = HttpStatus.BAD_REQUEST;
         }
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
@@ -231,8 +234,9 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .errorDescription(e.getMessage())
                     .serviceProofSuccess(false)
                     .build();
-            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            log.warn("Authorization fail. Response: {}", response.toString());
             status = HttpStatus.UNAUTHORIZED;
+            return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
         }
         log.debug("Auth is ok!");
         int access = 0;
@@ -283,7 +287,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .errorDescription(e.getMessage())
                     .serviceProofSuccess(false)
                     .build();
-            log.warn("Auth is time out. Authorization response: {}", response.toString());
+            log.warn("Authorization fail. Response: {}", response.toString());
             status = HttpStatus.BAD_REQUEST;
         }
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
@@ -382,7 +386,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .fail(true)
                     .failDescription(e.getMessage())
                     .build();
-            log.warn("Authorization response: {}", response.toString());
+            log.warn("Response: {}", response.toString());
             status = HttpStatus.UNAUTHORIZED;
         }
 

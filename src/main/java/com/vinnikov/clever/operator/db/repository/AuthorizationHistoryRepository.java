@@ -1,9 +1,7 @@
 package com.vinnikov.clever.operator.db.repository;
 
 import com.vinnikov.clever.operator.db.entity.AuthorizationHistoryEntity;
-import com.vinnikov.clever.operator.db.entity.EmployeeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;

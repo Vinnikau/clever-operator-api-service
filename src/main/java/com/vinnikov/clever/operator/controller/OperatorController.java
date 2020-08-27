@@ -27,7 +27,7 @@ public class OperatorController {
     }
 
     @PostMapping("/service/list")
-    public ResponseEntity<ServiceListResponse> authorization(@RequestBody ServiceListRequest request) {
+    public ResponseEntity<ServiceListResponse> serviceList(@RequestBody ServiceListRequest request) {
         log.info("Was received service-list-request: {}", request.getAuthorizationKey());
         return operatorService.getServiceList(request);
     }

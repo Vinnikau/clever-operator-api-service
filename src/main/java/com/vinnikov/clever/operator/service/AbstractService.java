@@ -14,7 +14,7 @@ public abstract class AbstractService {
     @Resource
     protected AuthorizationHistoryRepository authorizationHistoryRepository;
 
-    protected void isValidAuthorization(String key) {
+    protected void isValidAuthorization(String key) throws RuntimeException {
         Collection<AuthorizationHistoryEntity> authorizations =
                 authorizationHistoryRepository.findByAuthorizationKey(key);
         AuthorizationHistoryEntity auth = null;
