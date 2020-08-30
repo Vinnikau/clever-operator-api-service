@@ -121,6 +121,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                 .availableServices(availableServices)
                 .build();
         status = HttpStatus.OK;
+        log.info(response.toString());
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
@@ -172,13 +173,14 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                 throw new RuntimeException("Некорректные данные");
             }
 
+            String CName = customer.getNameCustomer() + " " + customer.getPatronymicCustomer()
+                    + " " + customer.getSurnameCustomer();
             response = TicketUseResponse.builder()
                     .accessRights(access)
                     .authorizationSuccess(true)
                     .fail(false)
                     .failDescription("")
-                    .customerName(customer.getNameCustomer() + " " + customer.getPatronymicCustomer()
-                            + " " + customer.getSurnameCustomer())
+                    .customerName(CName.replaceAll("null ", ""))
                     .customerPhone(customer.getPhoneCustomer())
                     .serviceId(ticket.getIdService())
                     .serviceName(service.getName())

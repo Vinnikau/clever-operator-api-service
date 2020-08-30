@@ -34,7 +34,7 @@ public class OperatorController {
 
     @PostMapping("/ticket/can/approve")
     public ResponseEntity<TicketUseResponse> canApproveTicket(@RequestBody TicketUseRequest request) {
-        log.info("Was received approve-request: {}", request.getAuthorizationKey());
+        log.info("Was received approve-request: {}", request.toString());
         return operatorService.canApproveTicketUseQr(request);
     }
 
