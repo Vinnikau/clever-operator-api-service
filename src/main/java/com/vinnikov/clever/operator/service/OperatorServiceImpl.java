@@ -188,6 +188,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .serviceProvideSuccess(true)
                     .build();
             status = HttpStatus.OK;
+            log.info("Ticket use response: {}", response.toString());
 
         } catch (Exception e) {
             response = TicketUseResponse.builder()
@@ -276,6 +277,7 @@ public class OperatorServiceImpl extends AbstractService implements OperatorServ
                     .ticketCode(request.getTicketCode())
                     .build();
             status = HttpStatus.OK;
+            log.info("Ticket proof response: {}", response.toString());
         } catch (Exception e) {
             response = TicketUseProofResponse.builder()
                     .accessRights(access)

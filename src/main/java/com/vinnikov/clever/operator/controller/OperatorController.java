@@ -22,13 +22,13 @@ public class OperatorController {
 
     @PostMapping("/auth")
     public ResponseEntity<AuthorizationResponse> authorization(@RequestBody AuthorizationRequest request) {
-        log.info("Was received auth-request by user: {}", request.getUserName());
+        log.info("Was received auth-request by user: {}", request.toString());
         return operatorService.authorization(request);
     }
 
     @PostMapping("/service/list")
     public ResponseEntity<ServiceListResponse> serviceList(@RequestBody ServiceListRequest request) {
-        log.info("Was received service-list-request: {}", request.getAuthorizationKey());
+        log.info("Was received service-list-request: {}", request.toString());
         return operatorService.getServiceList(request);
     }
 
@@ -40,7 +40,7 @@ public class OperatorController {
 
     @PostMapping("/ticket/proof")
     public ResponseEntity<TicketUseProofResponse> proofTicket(@RequestBody TicketUseProofRequest request) {
-        log.info("Was received proof-request: {}", request.getAuthorizationKey());
+        log.info("Was received proof-request: {}", request.toString());
         return operatorService.proofTicketUseQr(request);
     }
 
